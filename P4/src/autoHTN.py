@@ -69,19 +69,18 @@ def make_method (name, rule):
 			tempList.append((requisite, value))
 	
 	tempList.sort(key=lambda x: priorityList.index(x[0]))
-	# print(tempList)
 
 	def method (state, ID):
 		# your code here
-
-		# return [('have_enough', ID, 'wood', 1), ('op_craft_plank', ID)]
 		
 		returnList = []
+		
 		if(len(tempList) > 0):
 			returnList = [('have_enough', ID, req, val) for req, val in tempList]
+		
 		returnList.append(('op_{}'.format(name), ID))
-
 		return returnList
+
 	method.__name__ = format(name)
 	return method
 
@@ -91,38 +90,29 @@ def declare_methods (data):
 
 	# your code here
 	# hint: call make_method, then declare the method to pyhop using pyhop.declare_methods('foo', m1, m2, ..., mk)	
-	#methods = []
 	
 	dictionary = {}
 	timeDict = {}
 	for name, rule in data["Recipes"].items():
-		#make operator
-		#print(rule)
-		#make_operator(rule)
 
 		production = next(iter(rule["Produces"]))
 		newMethod = make_method(name, rule)
 		timeDict[newMethod] = rule["Time"]
+		
 		if(production in dictionary.keys()):
 			dictionary[production].append(newMethod)
 		else:
 			dictionary[production] = [newMethod]
-		#methods.append(make_method(name, rule))
-		#dictionary
-	#timeDict["iron_pickaxe for ore"] = 20
+	
 	for key, value in dictionary.items():
 		value.sort(key=lambda x: timeDict[x])
 		pyhop.declare_methods('produce_{}'.format(key), *value)
-	#for 
-	#pyhop.declare_methods('produce_{}'.format(),operations)
+	
 	pass			
 
 def make_operator (rule):
 	name, recipe = rule
 
-	# for requisite, value in recipe["Requires"].items():
-	# 	print(requisite)
-	# 	print(value)
 	def operator (state, ID):
 		
 		if state.time[ID] < recipe["Time"]:
@@ -157,9 +147,6 @@ def declare_operators (data):
 	# hint: call make_operator, then declare the operator to pyhop using pyhop.declare_operators(o1, o2, ..., ok)
 	operations = []
 	for rule in data["Recipes"].items():
-		#make operator
-		#print(rule)
-		#make_operator(rule)
 		operations.append(make_operator(rule))
 	
 	pyhop.declare_operators(*operations)
@@ -189,7 +176,8 @@ def add_heuristic (data, ID):
 		# more dynamic one.  For this particular goal ...
 		# just for pruning
 
-		tools = ["bench",
+		tools = [
+			"bench",
 			"furnace",
 			"iron_axe",
 			"iron_pickaxe",
@@ -197,6 +185,14 @@ def add_heuristic (data, ID):
 			"stone_pickaxe",
 			"wooden_axe",
 			"wooden_pickaxe"]
+
+		efficiencies = {
+			"stone_pickaxe" : ("cobble", 5),
+			"iron_pickaxe" : ("ingot", 7),
+			"wooden_axe" : ("wood", 2),
+			"stone_axe" : ("wood", 5),
+			"iron_axe" : ("wood", 10),
+		}
 
 		if(len(calling_stack) <= 1):
 			return False
@@ -209,12 +205,10 @@ def add_heuristic (data, ID):
 			if (getattr(state, curr_task[2])[ID] - 4 > state.enough[curr_task[2]]):
 				return True
 
-			if (curr_task[2] == "iron_pickaxe"):
+			""" if (curr_task[2] == "iron_pickaxe"):
 				for task in tasks:
 					if task[0] == "have_enough" and task[2] == "ingot":
 						if task[3] < 7:
-							state.prunes += 1
-							print("prunes: ", state.prunes)
 							return True
 						return False
 				return True
@@ -223,11 +217,18 @@ def add_heuristic (data, ID):
 				for task in tasks:
 					if task[0] == "have_enough" and task[2] == "wood":
 						if task[3] < 2:
-							state.prunes += 1
-							print("prunes: ", state.prunes)
 							return True
 						return False
-				return True
+				return True """
+
+			for tool, info in efficiencies.items():
+				if (curr_task[2] == tool):
+					for task in tasks:
+						if task[0] == "have_enough" and task[2] == info[0]:
+							if task[3] < info[1]:
+								return True
+							return False
+					return True
 
 			for task in calling_stack:
 				if(task[0] == "produce" and task == curr_task and task[2] in tools):
@@ -275,7 +276,6 @@ if __name__ == '__main__':
 
 	# my own stuff
 	state.enough = {}
-	state.prunes = 0
 
 	declare_operators(data)
 	declare_methods(data)
@@ -288,4 +288,4 @@ if __name__ == '__main__':
 	# try verbose=1 if it is taking too long
 	pyhop.pyhop(state, goals, verbose=1)
 	# pyhop.pyhop(state, [('have_enough', 'agent', 'cart', 1),('have_enough', 'agent', 'rail', 20)], verbose=3)
-	#pyhop.pyhop(state, [('have_enough', 'agent', 'wood', 1)], verbose=3)
+	# pyhop.pyhop(state, [('have_enough', 'agent', 'wood', 1)], verbose=3)
