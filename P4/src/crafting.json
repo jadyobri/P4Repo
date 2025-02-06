@@ -24,8 +24,8 @@
     "time" : 175
  },
  "Goal": {
-   "cart": 1,
-   "rail": 10
+    "cart" : 1,
+    "rail" : 10
  },
  "Recipes": {
    "iron_axe for wood": {

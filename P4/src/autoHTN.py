@@ -17,6 +17,47 @@ pyhop.declare_methods ('produce', produce)
 
 def make_method (name, rule):
 	
+	priorityList = [
+		"wood",
+		"bench",
+		"plank",
+		"cobble",
+		"ingot",
+		"stick",
+		"wooden_pickaxe",
+		"furnace",
+		"coal",
+		"stone_pickaxe",
+		"ore",
+		"cart",
+		"rail",
+		"wooden_axe",
+		"stone_axe",
+		"iron_axe",
+		"iron_pickaxe",
+		]
+
+	""" priorityList = [
+		"wood",
+		"plank",
+		"bench",
+		"stick",
+		"wooden_axe",
+		"wooden_pickaxe",
+		"coal",
+		"cobble",
+		"furnace",
+		"stone_axe",
+		"stone_pickaxe",
+		"ore",
+		"ingot",
+		"cart",
+		"rail",
+		"iron_axe",
+		"iron_pickaxe",
+		] """
+	
+	# priorityList.reverse()
 	tempList = []
 
 	if "Requires" in rule.keys():
@@ -26,6 +67,9 @@ def make_method (name, rule):
 	if "Consumes" in rule.keys():
 		for requisite, value in rule["Consumes"].items():
 			tempList.append((requisite, value))
+	
+	tempList.sort(key=lambda x: priorityList.index(x[0]))
+	# print(tempList)
 
 	def method (state, ID):
 		# your code here
@@ -48,6 +92,7 @@ def declare_methods (data):
 	# your code here
 	# hint: call make_method, then declare the method to pyhop using pyhop.declare_methods('foo', m1, m2, ..., mk)	
 	#methods = []
+	
 	dictionary = {}
 	timeDict = {}
 	for name, rule in data["Recipes"].items():
@@ -64,20 +109,16 @@ def declare_methods (data):
 			dictionary[production] = [newMethod]
 		#methods.append(make_method(name, rule))
 		#dictionary
+	#timeDict["iron_pickaxe for ore"] = 20
 	for key, value in dictionary.items():
 		value.sort(key=lambda x: timeDict[x])
 		pyhop.declare_methods('produce_{}'.format(key), *value)
-		if(key == "wood"):
-			print([x.__name__ for x in value])
 	#for 
 	#pyhop.declare_methods('produce_{}'.format(),operations)
 	pass			
 
 def make_operator (rule):
 	name, recipe = rule
-	
-	if "Requires" in recipe.keys():
-		print(recipe["Requires"])
 
 	# for requisite, value in recipe["Requires"].items():
 	# 	print(requisite)
@@ -115,7 +156,6 @@ def declare_operators (data):
 	# your code here
 	# hint: call make_operator, then declare the operator to pyhop using pyhop.declare_operators(o1, o2, ..., ok)
 	operations = []
-	print()
 	for rule in data["Recipes"].items():
 		#make operator
 		#print(rule)
@@ -158,38 +198,44 @@ def add_heuristic (data, ID):
 			"wooden_axe",
 			"wooden_pickaxe"]
 
-		if(len(calling_stack)<=1):
+		if(len(calling_stack) <= 1):
 			return False
 
 		if(curr_task[0] == "have_enough"):
 			state.enough[curr_task[2]] = curr_task[3]
 		
 		if(curr_task[0] == "produce"):
-			""" if(len(calling_stack) >= 3 and calling_stack[-3] == curr_task):
-				return False """
 
 			if (getattr(state, curr_task[2])[ID] - 4 > state.enough[curr_task[2]]):
 				return True
 
+			if (curr_task[2] == "iron_pickaxe"):
+				for task in tasks:
+					if task[0] == "have_enough" and task[2] == "ingot":
+						if task[3] < 7:
+							state.prunes += 1
+							print("prunes: ", state.prunes)
+							return True
+						return False
+				return True
+
+			if (curr_task[2] == "wooden_axe"):
+				for task in tasks:
+					if task[0] == "have_enough" and task[2] == "wood":
+						if task[3] < 2:
+							state.prunes += 1
+							print("prunes: ", state.prunes)
+							return True
+						return False
+				return True
+
 			for task in calling_stack:
 				if(task[0] == "produce" and task == curr_task and task[2] in tools):
-					""" print("got here")
-					print(calling_stack)
-					print(tasks)
-					print(curr_task) """
+					#print("got here")
+					#print(calling_stack)
+					#print(tasks)
+					#print(curr_task)
 					return True
-		# if(depth > 50):
-		# 	return True
-		# if(curr_task in calling_stack):
-		# 	print(tasks)
-		# 	return True
-		""" if (curr_task[0] == "have_enough"):
-			state.enough[curr_task[2]] = curr_task[3]
-		
-		if (curr_task[0] == "produce"):
-			state.produced[curr_task[2]] += 1
-			if (state.enough[curr_task[2]] - state.produced[curr_task[2]] < 0):
-				return True """
 		
 		return False # if True, prune this branch
 
@@ -229,6 +275,7 @@ if __name__ == '__main__':
 
 	# my own stuff
 	state.enough = {}
+	state.prunes = 0
 
 	declare_operators(data)
 	declare_methods(data)
@@ -239,6 +286,6 @@ if __name__ == '__main__':
 
 	# Hint: verbose output can take a long time even if the solution is correct; 
 	# try verbose=1 if it is taking too long
-	pyhop.pyhop(state, goals, verbose=2)
+	pyhop.pyhop(state, goals, verbose=1)
 	# pyhop.pyhop(state, [('have_enough', 'agent', 'cart', 1),('have_enough', 'agent', 'rail', 20)], verbose=3)
 	#pyhop.pyhop(state, [('have_enough', 'agent', 'wood', 1)], verbose=3)
