@@ -16,48 +16,27 @@ def produce (state, ID, item):
 pyhop.declare_methods ('produce', produce)
 
 def make_method (name, rule):
-	
+
 	priorityList = [
 		"wood",
-		"bench",
 		"plank",
-		"cobble",
-		"ingot",
+		"bench",
 		"stick",
+		"wooden_axe",
 		"wooden_pickaxe",
-		"furnace",
 		"coal",
+		"cobble",
+		"furnace",
+		"stone_axe",
 		"stone_pickaxe",
 		"ore",
+		"ingot",
 		"cart",
 		"rail",
-		"wooden_axe",
-		"stone_axe",
 		"iron_axe",
 		"iron_pickaxe",
 		]
-
-	""" priorityList = [
-		"wood",
-		"plank",
-		"bench",
-		"stick",
-		"wooden_axe",
-		"wooden_pickaxe",
-		"coal",
-		"cobble",
-		"furnace",
-		"stone_axe",
-		"stone_pickaxe",
-		"ore",
-		"ingot",
-		"cart",
-		"rail",
-		"iron_axe",
-		"iron_pickaxe",
-		] """
 	
-	# priorityList.reverse()
 	tempList = []
 
 	if "Requires" in rule.keys():
@@ -205,22 +184,6 @@ def add_heuristic (data, ID):
 			if (getattr(state, curr_task[2])[ID] - 4 > state.enough[curr_task[2]]):
 				return True
 
-			""" if (curr_task[2] == "iron_pickaxe"):
-				for task in tasks:
-					if task[0] == "have_enough" and task[2] == "ingot":
-						if task[3] < 7:
-							return True
-						return False
-				return True
-
-			if (curr_task[2] == "wooden_axe"):
-				for task in tasks:
-					if task[0] == "have_enough" and task[2] == "wood":
-						if task[3] < 2:
-							return True
-						return False
-				return True """
-
 			for tool, info in efficiencies.items():
 				if (curr_task[2] == tool):
 					for task in tasks:
@@ -232,10 +195,6 @@ def add_heuristic (data, ID):
 
 			for task in calling_stack:
 				if(task[0] == "produce" and task == curr_task and task[2] in tools):
-					#print("got here")
-					#print(calling_stack)
-					#print(tasks)
-					#print(curr_task)
 					return True
 		
 		return False # if True, prune this branch
