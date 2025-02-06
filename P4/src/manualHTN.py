@@ -20,7 +20,7 @@ def op_craft_wooden_axe_at_bench (state, ID):
 
 # your code here
 def op_wooden_axe_for_wood(state, ID):
-	if(state.time[ID] >= 2):
+	if(state.time[ID] >= 2 and state.wooden_axe[ID] == 1):
 		state.wood[ID] += 1
 		state.time[ID] -= 2
 		return state
@@ -69,7 +69,7 @@ def produce (state, ID, item):
 	elif item == "plank":
 		return [('produce_plank', ID)]
 	elif item == "stick":
-		return [('produce_stick')]
+		return [('produce_stick', ID)]
 	elif item == "bench":
 		if(state.made_bench[ID] is True):
 			return False
@@ -100,7 +100,7 @@ def craft_wooden_axe_at_bench (state, ID):
 
 # your code here
 def wooden_axe_for_wood(state, ID):
-	return [('op_wooden_axe_for_wood', ID)]
+	return [('have_enough', ID, 'wooden_axe', 1),('op_wooden_axe_for_wood', ID)]
 
 def craft_plank(state, ID):
 	return [('have_enough', ID, 'wood', 1), ('op_craft_plank', ID)]

@@ -21,11 +21,10 @@
    "wooden_pickaxe"
  ],
  "Initial": {
-    "time" : 175
+    "time" : 300
  },
  "Goal": {
-    "cart" : 1,
-    "rail" : 10
+    "plank":1
  },
  "Recipes": {
    "iron_axe for wood": {
