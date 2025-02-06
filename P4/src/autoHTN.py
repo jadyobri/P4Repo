@@ -131,8 +131,24 @@ def add_heuristic (data, ID):
 	# e.g. def heuristic2(...); pyhop.add_check(heuristic2)
 	def heuristic (state, curr_task, tasks, plan, depth, calling_stack):
 		# your code here
-		
-		""" if(len(calling_stack)<=1):
+		# return feasible if there is one
+		# if heuristic that eliminates some branches
+		# if you got a tool that produces wood, do not consider one that produces wood in same thought line
+		# if you want
+
+		# if the plan returns it, it knows the goal
+		# reduced planning heuristic
+		# brother goal clobers brother goal
+		# mental search is calling stack
+
+		# order what we need (not just given these tools)
+		# brothers goals in any order
+		# pyhop has line of get me methods of these tasks, cereally considers like selector in behavior tree going till first works
+		# change would be let write heuristic to intercept that with one line change the pyhop.
+		# slight bit of it here, set preference of iron over wood in some situation.
+		# more dynamic one.  For this particular goal ...
+		# just for pruning
+		if(len(calling_stack)<=1):
 			return False
 		if(curr_task[0] == "produce"):
 			if(len(calling_stack) >= 3 and calling_stack[-3] == curr_task):
@@ -143,12 +159,12 @@ def add_heuristic (data, ID):
 					print(calling_stack)
 					print(tasks)
 					print(curr_task)
-					return True """
-		if(depth > 50):
-			return True
-		if(curr_task in calling_stack):
-			print(tasks)
-			return True
+					return True 
+		# if(depth > 50):
+		# 	return True
+		# if(curr_task in calling_stack):
+		# 	print(tasks)
+		# 	return True
 		""" if (curr_task[0] == "have_enough"):
 			state.enough[curr_task[2]] = curr_task[3]
 		

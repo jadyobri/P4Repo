@@ -21,10 +21,10 @@
    "wooden_pickaxe"
  ],
  "Initial": {
-    "time": 100
+    "time" : 100
  },
  "Goal": {
-   "plank": 5
+   "iron_pickaxe": 1
  },
  "Recipes": {
    "iron_axe for wood": {
