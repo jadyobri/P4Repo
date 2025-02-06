@@ -111,10 +111,6 @@ def craft_stick(state, ID):
 def craft_bench(state, ID):
 	return[('have_enough', ID, 'plank', 4),('op_craft_bench', ID)]
 
-
-
-
-
 pyhop.declare_methods ('produce_wood', wooden_axe_for_wood, punch_for_wood)
 pyhop.declare_methods ('produce_wooden_axe', craft_wooden_axe_at_bench)
 pyhop.declare_methods ('produce_plank', craft_plank)
