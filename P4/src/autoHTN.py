@@ -148,18 +148,36 @@ def add_heuristic (data, ID):
 		# slight bit of it here, set preference of iron over wood in some situation.
 		# more dynamic one.  For this particular goal ...
 		# just for pruning
+
+		tools = ["bench",
+			"furnace",
+			"iron_axe",
+			"iron_pickaxe",
+			"stone_axe",
+			"stone_pickaxe",
+			"wooden_axe",
+			"wooden_pickaxe"]
+
 		if(len(calling_stack)<=1):
 			return False
+
+		if(curr_task[0] == "have_enough"):
+			state.enough[curr_task[2]] = curr_task[3]
+		
 		if(curr_task[0] == "produce"):
-			if(len(calling_stack) >= 3 and calling_stack[-3] == curr_task):
-				return False
+			""" if(len(calling_stack) >= 3 and calling_stack[-3] == curr_task):
+				return False """
+
+			if (getattr(state, curr_task[2])[ID] - 4 > state.enough[curr_task[2]]):
+				return True
+
 			for task in calling_stack:
-				if(task[0] == "produce" and task == curr_task):
-					print("got here")
+				if(task[0] == "produce" and task == curr_task and task[2] in tools):
+					""" print("got here")
 					print(calling_stack)
 					print(tasks)
-					print(curr_task)
-					return True 
+					print(curr_task) """
+					return True
 		# if(depth > 50):
 		# 	return True
 		# if(curr_task in calling_stack):
@@ -172,8 +190,6 @@ def add_heuristic (data, ID):
 			state.produced[curr_task[2]] += 1
 			if (state.enough[curr_task[2]] - state.produced[curr_task[2]] < 0):
 				return True """
-		
-		
 		
 		return False # if True, prune this branch
 
@@ -211,6 +227,9 @@ if __name__ == '__main__':
 	state = set_up_state(data, 'agent', time=239) # allot time here
 	goals = set_up_goals(data, 'agent')
 
+	# my own stuff
+	state.enough = {}
+
 	declare_operators(data)
 	declare_methods(data)
 	add_heuristic(data, 'agent')
@@ -220,6 +239,6 @@ if __name__ == '__main__':
 
 	# Hint: verbose output can take a long time even if the solution is correct; 
 	# try verbose=1 if it is taking too long
-	pyhop.pyhop(state, goals, verbose=3)
+	pyhop.pyhop(state, goals, verbose=2)
 	# pyhop.pyhop(state, [('have_enough', 'agent', 'cart', 1),('have_enough', 'agent', 'rail', 20)], verbose=3)
 	#pyhop.pyhop(state, [('have_enough', 'agent', 'wood', 1)], verbose=3)
